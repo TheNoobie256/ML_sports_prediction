@@ -11,10 +11,7 @@ class SportsPredictor:
         self.model_path = model_path
         self.model = None
         # We define the specific features the model expects
-        self.features = [
-            'home_elo', 'away_elo', 'home_rest_days', 'away_rest_days',
-            'home_goals_last_5', 'away_goals_last_5'
-        ]
+        self.features = ['prob_home_implied', 'prob_away_implied', 'prob_draw_implied', 'home_favored']
 
     def train(self, historical_data: pd.DataFrame):
         """
