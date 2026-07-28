@@ -37,3 +37,15 @@ class SportsPredictor:
             'home_win_prob': probabilities[1],
             'away_win_prob': probabilities[0]
         }
+
+    def get_feature_importances(self) -> pd.DataFrame:
+        if self.model is None:
+            return pd.DataFrame()
+
+        importances = self.model.feature_importances_
+
+        df = pd.DataFrame({
+            "Importance": importances
+        }, index=self.features)
+
+        return df.sort_values(by="Importance", ascending=False)

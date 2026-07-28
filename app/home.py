@@ -125,23 +125,39 @@ with tab1:
                             else:
                                 live_predictions.append(0.0)
 
-                    # Calculate Expected Value (EV)
                     odds_df['Model_Prob'] = live_predictions
                     odds_df['Bookie_Implied_Prob'] = 1 / odds_df['Odds']
                     odds_df['EV_ROI'] = (odds_df['Model_Prob'] * (odds_df['Odds'] - 1)) - (1 - odds_df['Model_Prob'])
+
+                    safe_odds = odds_df['Odds'].replace(1.0, 1.01)
+                    odds_df['Kelly_Fraction'] = odds_df['EV_ROI'] / (safe_odds - 1)
 
                     value_bets = odds_df[odds_df['EV_ROI'] > 0.05].copy()
                     value_bets['Model_Prob'] = (value_bets['Model_Prob'] * 100).map("{:.1f}%".format)
                     value_bets['Bookie_Implied_Prob'] = (value_bets['Bookie_Implied_Prob'] * 100).map("{:.1f}%".format)
                     value_bets['EV_ROI'] = (value_bets['EV_ROI'] * 100).map("{:.1f}%".format)
 
+                    value_bets['Suggested_Bet'] = (value_bets['Kelly_Fraction'].clip(lower=0) * 100).map(
+                        "{:.2f}% of Bankroll".format)
+
+                    value_bets = value_bets.drop(columns=['Kelly_Fraction'])
+
                     if not value_bets.empty:
                         st.dataframe(value_bets, use_container_width=True)
                     else:
                         st.info("No +EV value bets found in current market lines.")
 
+                    st.divider()
+                    st.markdown("### 🧠 Under the Hood: Feature Importance")
+                    st.markdown(
+                        "This chart reveals exactly which data points the XGBoost model weighed the heaviest to find these edges.")
+
+                    importance_df = predictor.get_feature_importances()
+                    st.bar_chart(importance_df)
+
                 else:
-                    st.warning(f"No active live market games found for {LEAGUE_DISPLAY_NAMES[league_choice]}. The league may currently be in its off-season.")
+                    st.warning(
+                        f"No active live market games found for {LEAGUE_DISPLAY_NAMES[league_choice]}. The league may currently be in its off-season.")
 
 with tab2:
     st.subheader("Historical Model Validation")
