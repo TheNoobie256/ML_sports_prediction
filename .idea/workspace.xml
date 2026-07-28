@@ -4,7 +4,11 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="55b683f4-4274-4a14-9105-d5e57569244a" name="Changes" comment="" />
+    <list default="true" id="55b683f4-4274-4a14-9105-d5e57569244a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.github/workflows/retrain_models.yml" beforeDir="false" afterPath="$PROJECT_DIR$/.github/workflows/retrain_models.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/home.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/home.py" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -14,6 +18,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Python Script" />
+        <option value="GitHub Workflow" />
       </list>
     </option>
   </component>
@@ -67,8 +72,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-31caf2ab9e3c-JavaScript-PY-261.24374.152" />
-        <option value="bundled-python-sdk-c59985aa861c-c2ffad84badb-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-261.24374.152" />
+        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PY-262.8665.369" />
+        <option value="bundled-python-sdk-6fa658e1df1a-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.8665.369" />
       </set>
     </attachedChunks>
   </component>
@@ -80,7 +85,10 @@
       <option name="presentableId" value="Default" />
       <updated>1785146017382</updated>
       <workItem from="1785146018399" duration="3594000" />
-      <workItem from="1785231058763" duration="7218000" />
+      <workItem from="1785231058763" duration="7739000" />
+      <workItem from="1785239035681" duration="921000" />
+      <workItem from="1785240216885" duration="120000" />
+      <workItem from="1785257452963" duration="306000" />
     </task>
     <servers />
   </component>

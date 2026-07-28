@@ -15,11 +15,9 @@ st.title("📈 ML Sports Predictor & EV Calculator")
 with st.sidebar:
     st.header("⚙️ Configuration")
 
-    # Safely load API keys from .streamlit/secrets.toml
     odds_api_key = st.secrets.get("ODDS_API_KEY", "")
     api_football_key = st.secrets.get("API_FOOTBALL_KEY", "")
 
-    # Hide the inputs entirely if keys are successfully loaded
     if odds_api_key and api_football_key:
         st.success("✅ Successfully read API keys from secrets!")
     else:
@@ -27,7 +25,6 @@ with st.sidebar:
         odds_api_key = st.text_input("Odds API Key", type="password")
         api_football_key = st.text_input("API-Football Key", type="password")
 
-    # Map the API codes to readable UI names
     LEAGUE_DISPLAY_NAMES = {
         "soccer_epl": "English Premier League",
         "soccer_spain_la_liga": "Spanish La Liga",
@@ -43,12 +40,8 @@ with st.sidebar:
 
     sport_type = "basketball" if "basketball" in league_choice else "soccer"
 
-# --- NAVIGATION TABS ---
 tab1, tab2 = st.tabs(["🔥 Live Value Bets", "📊 Strategy Backtester"])
 
-# ==========================================
-# TAB 1: LIVE MARKET DASHBOARD
-# ==========================================
 with tab1:
     st.subheader("Live Market Dashboard")
 
@@ -60,7 +53,6 @@ with tab1:
                 odds_df = fetch_live_odds(odds_api_key, league_choice)
 
                 if not odds_df.empty and sport_type == "soccer":
-                    # 1. Map league to API-Football ID
                     league_id_map = {
                         "soccer_epl": 39,
                         "soccer_spain_la_liga": 140,
@@ -68,17 +60,13 @@ with tab1:
                     }
                     api_league_id = league_id_map.get(league_choice, 39)
 
-                    # 2. Bulk fetch injuries
-                    st.info("Fetching league-wide injury reports...")
                     league_injuries = fetch_league_injuries(api_football_key, api_league_id, season=2026)
 
-                    # 3. Load Model
                     predictor = SportsPredictor()
                     try:
                         predictor.load_model(sport_type="soccer")
                         live_predictions = []
 
-                        # 4. Iterate and Predict
                         for index, row in odds_df.iterrows():
                             try:
                                 home_team, away_team = row['Matchup'].split(" vs ")
@@ -107,7 +95,6 @@ with tab1:
 
                             prediction = predictor.predict_match(live_feature_row)
 
-                            # Assign correct probability based on the team in the row
                             if row['Team'] == home_team:
                                 live_predictions.append(prediction['home_win_prob'])
                             elif row['Team'] == away_team:
@@ -115,13 +102,11 @@ with tab1:
                             else:
                                 live_predictions.append(0.0)
 
-                        # 5. Calculate Expected Value (EV)
                         odds_df['Model_Prob'] = live_predictions
                         odds_df['Bookie_Implied_Prob'] = 1 / odds_df['Odds']
                         odds_df['EV_ROI'] = (odds_df['Model_Prob'] * (odds_df['Odds'] - 1)) - (
                                     1 - odds_df['Model_Prob'])
 
-                        # 6. Format and display profitable bets
                         value_bets = odds_df[odds_df['EV_ROI'] > 0.05].copy()
                         value_bets['Model_Prob'] = (value_bets['Model_Prob'] * 100).map("{:.1f}%".format)
                         value_bets['Bookie_Implied_Prob'] = (value_bets['Bookie_Implied_Prob'] * 100).map(
@@ -137,9 +122,6 @@ with tab1:
                 else:
                     st.error("No odds data found.")
 
-# ==========================================
-# TAB 2: THE BACKTESTING ENGINE
-# ==========================================
 with tab2:
     st.subheader("Historical Model Validation")
     st.markdown(

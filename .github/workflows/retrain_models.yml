@@ -1,30 +1,25 @@
 name: Weekly Model Retraining
 
-# 1. THE TRIGGERS
 on:
   schedule:
-    # Runs at 03:00 AM every Monday
     - cron: '0 3 * * 1'
   workflow_dispatch:
-    # Allows you to click a "Run" button on GitHub to test it manually
-
-# 2. PERMISSIONS
 permissions:
-  contents: write # Allows the bot to push the new models to your repo
+  contents: write
 
-# 3. THE INSTRUCTIONS
 jobs:
   retrain-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.14.3'
+          cache: 'pip'
 
       - name: Install Dependencies
         run: |
