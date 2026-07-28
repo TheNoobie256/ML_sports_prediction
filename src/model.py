@@ -1,63 +1,39 @@
-import pandas as pd
-import xgboost as xgb
 import joblib
+import pandas as pd
 from pathlib import Path
-from sklearn.model_selection import train_test_split
-from sklearn.metrics import accuracy_score, log_loss
 
 
 class SportsPredictor:
-    def __init__(self, model_path: str = "models/xgb_model.joblib"):
-        self.model_path = model_path
+    def __init__(self):
         self.model = None
-        self.features = [
-            'prob_home_implied',
-            'prob_away_implied',
-            'prob_draw_implied',
-            'home_favored',
-            'home_injury_impact',  # <-- New Feature
-            'away_injury_impact',  # <-- New Feature
-            'injury_differential'  # <-- New Feature
-        ]
+        self.features = []
 
-    def train(self, historical_data: pd.DataFrame):
+    def load_model(self, sport_type: str = "soccer"):
+        if sport_type == "basketball":
+            model_path = "models/xgb_nba_model.joblib"
+            self.features = [
+                'prob_home_implied', 'prob_away_implied', 'home_favored',
+                'home_back_to_back', 'away_back_to_back'
+            ]
+        else:
+            model_path = "models/xgb_model.joblib"
+            self.features = [
+                'prob_home_implied', 'prob_away_implied', 'prob_draw_implied', 'home_favored',
+                'home_injury_impact', 'away_injury_impact', 'injury_differential',
+                'home_offensive_form', 'away_offensive_form'  # <-- New features added here
+            ]
 
-        X = historical_data[self.features]
-        y = historical_data['home_win']
+        full_path = Path(model_path)
+        if not full_path.exists():
+            raise FileNotFoundError(f"Model file not found at {full_path}")
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        self.model = joblib.load(full_path)
 
-        self.model = xgb.XGBClassifier(
-            n_estimators=100,
-            learning_rate=0.05,
-            max_depth=4,
-            objective='binary:logistic',
-            random_state=42
-        )
-
-        self.model.fit(X_train, y_train)
-
-        preds = self.model.predict(X_test)
-        acc = accuracy_score(y_test, preds)
-        print(f"Model trained. Test Accuracy: {acc:.2f}")
-
-        Path(self.model_path).parent.mkdir(parents=True, exist_ok=True)
-        joblib.dump(self.model, self.model_path)
-
-    def load_model(self):
-        if not Path(self.model_path).exists():
-            raise FileNotFoundError(f"No model found at {self.model_path}. Train it first!")
-        self.model = joblib.load(self.model_path)
-
-    def predict_match(self, match_features: pd.DataFrame) -> dict:
-        if self.model is None:
-            self.load_model()
-
-        X_live = match_features[self.features]
-
+    def predict_match(self, live_features: pd.DataFrame) -> dict:
+        X_live = live_features[self.features]
         probabilities = self.model.predict_proba(X_live)[0]
 
         return {
-            "away_win_prob": float(probabilities[0]),
-            "home_win_prob": float(probabilities[1])
+            'home_win_prob': probabilities[1],
+            'away_win_prob': probabilities[0]
         }
