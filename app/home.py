@@ -49,23 +49,22 @@ with tab1:
         if not odds_api_key or not api_football_key:
             st.warning("Please enter both API keys in the sidebar.")
         else:
-            with st.spinner("Fetching odds and injury data..."):
+            with st.spinner("Fetching live market odds..."):
                 odds_df = fetch_live_odds(odds_api_key, league_choice)
 
-                if not odds_df.empty and sport_type == "soccer":
-                    league_id_map = {
-                        "soccer_epl": 39,
-                        "soccer_spain_la_liga": 140,
-                        "soccer_uefa_champs_league": 2,
-                    }
-                    api_league_id = league_id_map.get(league_choice, 39)
-
-                    league_injuries = fetch_league_injuries(api_football_key, api_league_id, season=2026)
-
+                if not odds_df.empty:
                     predictor = SportsPredictor()
-                    try:
-                        predictor.load_model(sport_type="soccer")
-                        live_predictions = []
+                    predictor.load_model(sport_type=sport_type)
+                    live_predictions = []
+
+                    if sport_type == "soccer":
+                        league_id_map = {
+                            "soccer_epl": 39,
+                            "soccer_spain_la_liga": 140,
+                            "soccer_uefa_champs_league": 2,
+                        }
+                        api_league_id = league_id_map.get(league_choice, 39)
+                        league_injuries = fetch_league_injuries(api_football_key, api_league_id, season=2026)
 
                         for index, row in odds_df.iterrows():
                             try:
@@ -102,30 +101,51 @@ with tab1:
                             else:
                                 live_predictions.append(0.0)
 
-                        odds_df['Model_Prob'] = live_predictions
-                        odds_df['Bookie_Implied_Prob'] = 1 / odds_df['Odds']
-                        odds_df['EV_ROI'] = (odds_df['Model_Prob'] * (odds_df['Odds'] - 1)) - (
-                                    1 - odds_df['Model_Prob'])
+                    elif sport_type == "basketball":
+                        for index, row in odds_df.iterrows():
+                            try:
+                                home_team, away_team = row['Matchup'].split(" vs ")
+                            except ValueError:
+                                home_team, away_team = "Unknown", "Unknown"
 
-                        value_bets = odds_df[odds_df['EV_ROI'] > 0.05].copy()
-                        value_bets['Model_Prob'] = (value_bets['Model_Prob'] * 100).map("{:.1f}%".format)
-                        value_bets['Bookie_Implied_Prob'] = (value_bets['Bookie_Implied_Prob'] * 100).map(
-                            "{:.1f}%".format)
-                        value_bets['EV_ROI'] = (value_bets['EV_ROI'] * 100).map("{:.1f}%".format)
+                            live_feature_row = pd.DataFrame([{
+                                'prob_home_implied': 1 / row['Odds'],
+                                'prob_away_implied': 1 / row.get('Away_Odds', row['Odds']),
+                                'home_favored': 1 if row.get('Odds', 0) < row.get('Away_Odds', 1) else 0,
+                                'home_back_to_back': 0.0,
+                                'away_back_to_back': 0.0
+                            }])
 
+                            prediction = predictor.predict_match(live_feature_row)
+
+                            if row['Team'] == home_team:
+                                live_predictions.append(prediction['home_win_prob'])
+                            elif row['Team'] == away_team:
+                                live_predictions.append(prediction['away_win_prob'])
+                            else:
+                                live_predictions.append(0.0)
+
+                    # Calculate Expected Value (EV)
+                    odds_df['Model_Prob'] = live_predictions
+                    odds_df['Bookie_Implied_Prob'] = 1 / odds_df['Odds']
+                    odds_df['EV_ROI'] = (odds_df['Model_Prob'] * (odds_df['Odds'] - 1)) - (1 - odds_df['Model_Prob'])
+
+                    value_bets = odds_df[odds_df['EV_ROI'] > 0.05].copy()
+                    value_bets['Model_Prob'] = (value_bets['Model_Prob'] * 100).map("{:.1f}%".format)
+                    value_bets['Bookie_Implied_Prob'] = (value_bets['Bookie_Implied_Prob'] * 100).map("{:.1f}%".format)
+                    value_bets['EV_ROI'] = (value_bets['EV_ROI'] * 100).map("{:.1f}%".format)
+
+                    if not value_bets.empty:
                         st.dataframe(value_bets, use_container_width=True)
+                    else:
+                        st.info("No +EV value bets found in current market lines.")
 
-                    except FileNotFoundError:
-                        st.error("Model file not found. Run train.py first.")
-                elif not odds_df.empty and sport_type == "basketball":
-                    st.info("NBA predictions UI routing coming soon!")
                 else:
-                    st.error("No odds data found.")
+                    st.warning(f"No active live market games found for {LEAGUE_DISPLAY_NAMES[league_choice]}. The league may currently be in its off-season.")
 
 with tab2:
     st.subheader("Historical Model Validation")
-    st.markdown(
-        "Simulate the XGBoost model's performance on past seasons to calculate actual Return on Investment (ROI).")
+    st.markdown("Simulate the XGBoost model's performance on past seasons to calculate actual Return on Investment (ROI).")
 
     col1, col2 = st.columns(2)
     with col1:
