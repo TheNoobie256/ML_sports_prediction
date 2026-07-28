@@ -7,62 +7,74 @@ from sklearn.metrics import accuracy_score
 
 
 def engineer_features(df: pd.DataFrame) -> tuple:
-    """
-    Cleans the CSV and creates predictive features without data leakage.
-    """
-    # 1. Drop rows missing the target or the Bet365 odds
     df = df.dropna(subset=['FTR', 'B365H', 'B365D', 'B365A']).copy()
 
-    # 2. Target Variable: 1 if Home Team wins, 0 if Away wins or Draw
     df['home_win'] = (df['FTR'] == 'H').astype(int)
 
-    # 3. Features: Implied Probabilities
-    # Bookmaker odds are an excellent proxy for team strength (Elo)
     df['prob_home_implied'] = 1 / df['B365H']
     df['prob_away_implied'] = 1 / df['B365A']
     df['prob_draw_implied'] = 1 / df['B365D']
-
-    # 4. Feature: Is the home team the market favorite?
     df['home_favored'] = (df['prob_home_implied'] > df['prob_away_implied']).astype(int)
 
-    features = ['prob_home_implied', 'prob_away_implied', 'prob_draw_implied', 'home_favored']
+    df['home_injury_impact'] = 0.0
+    df['away_injury_impact'] = 0.0
+    df['injury_differential'] = 0.0
+
+    features = [
+        'prob_home_implied', 'prob_away_implied', 'prob_draw_implied', 'home_favored',
+        'home_injury_impact', 'away_injury_impact', 'injury_differential'
+    ]
 
     return df[features], df['home_win'], features
 
 
 def main():
-    print("📥 Downloading historical EPL data (2023-2024 season)...")
-    url = "https://www.football-data.co.uk/mmz4281/2324/E0.csv"
-    df = pd.read_csv(url)
+    print("📥 Downloading multi-league historical data...")
 
-    print("⚙️ Engineering features...")
-    X, y, feature_names = engineer_features(df)
+    SOCCER_LEAGUES = {
+        "soccer_epl": "E0",
+        "soccer_spain_la_liga": "SP1"
+    }
 
-    # Train-test split
-    # CRITICAL: shuffle=False ensures we train on the past and test on the future
+    seasons = ['2324', '2223', '2122', '2021', '1920']
+    all_data = []
+
+    for league_name, league_code in SOCCER_LEAGUES.items():
+        for season in seasons:
+            url = f"https://www.football-data.co.uk/mmz4281/{season}/{league_code}.csv"
+            print(f"   Fetching {league_name} - Season {season}...")
+            try:
+                season_df = pd.read_csv(url, encoding='unicode_escape')
+                all_data.append(season_df)
+            except Exception as e:
+                print(f"   ⚠️ Could not download {league_name} {season}: {e}")
+
+    master_df = pd.concat(all_data, ignore_index=True)
+    print(f"✅ Total historical soccer matches loaded: {len(master_df)}")
+
+    print("⚙️ Engineering 7-feature dataset...")
+    X, y, feature_names = engineer_features(master_df)
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
 
-    print("🧠 Training XGBoost Model...")
+    print("🧠 Training Master Soccer XGBoost Model...")
     model = xgb.XGBClassifier(
-        n_estimators=100,
+        n_estimators=150,
         learning_rate=0.05,
-        max_depth=4,
+        max_depth=5,
         objective='binary:logistic',
         random_state=42
     )
-
     model.fit(X_train, y_train)
 
-    # Evaluate model performance
     preds = model.predict(X_test)
     acc = accuracy_score(y_test, preds)
-    print(f"✅ Model trained! Test Accuracy: {acc:.2%}")
+    print(f"✅ Master Model trained! Test Accuracy: {acc:.2%}")
 
-    # Save the model to disk
     model_path = Path("models/xgb_model.joblib")
     model_path.parent.mkdir(parents=True, exist_ok=True)
     joblib.dump(model, model_path)
-    print(f"💾 Model successfully saved to {model_path}")
+    print(f"💾 Master model successfully saved to {model_path}")
 
 
 if __name__ == "__main__":
