@@ -1,0 +1,49 @@
+name: Weekly Model Retraining
+
+# 1. THE TRIGGERS
+on:
+  schedule:
+    # Runs at 03:00 AM every Monday
+    - cron: '0 3 * * 1'
+  workflow_dispatch:
+    # Allows you to click a "Run" button on GitHub to test it manually
+
+# 2. PERMISSIONS
+permissions:
+  contents: write # Allows the bot to push the new models to your repo
+
+# 3. THE INSTRUCTIONS
+jobs:
+  retrain-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install --upgrade pip
+          # Ensure you have a requirements.txt in your root folder!
+          pip install -r requirements.txt 
+
+      - name: Retrain Master Soccer Model
+        run: python src/train.py
+
+      - name: Retrain NBA Model
+        run: python src/train_nba.py
+
+      - name: Commit and Push Updated Models
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Only commit if the .joblib files actually changed
+          git add models/*.joblib
+          git diff --quiet && git diff --staged --quiet || git commit -m "🤖 Auto-retrained XGBoost models with latest weekend data"
+          git push
