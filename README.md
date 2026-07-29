@@ -3,7 +3,7 @@
 ![Python Version](https://img.shields.io/badge/python-3.11%20%7C%203.14-blue)
 ![XGBoost](https://img.shields.io/badge/ML-XGBoost-orange)
 ![Streamlit](https://img.shields.io/badge/UI-Streamlit-FF4B4B)
-![Build Status](https://github.com/YourUsername/YourRepoName/actions/workflows/retrain_models.yml/badge.svg)
+![Build Status](https://github.com/TheNoobie256/ML_sports_prediction/actions/workflows/retrain_models.yml/badge.svg)
 
 An end-to-end Machine Learning Operations (MLOps) pipeline that calculates Expected Value (+EV) and Kelly Criterion bet sizing for live sports betting markets. The platform retrains its models monthly using automated GitHub Actions pipelines to prevent data drift and maximize Return on Investment (ROI).
 
@@ -47,8 +47,8 @@ An end-to-end Machine Learning Operations (MLOps) pipeline that calculates Expec
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/YourUsername/YourRepoName.git](https://github.com/YourUsername/YourRepoName.git)
-cd YourRepoName
+git clone [https://github.com/TheNoobie256/ML_sports_prediction.git](https://github.com/TheNoobie256/ML_sports_prediction.git)
+cd ML_sports_prediction
 ```
 
 ### 2. Set Up Virtual Environment & Dependencies
