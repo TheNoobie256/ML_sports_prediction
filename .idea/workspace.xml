@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="55b683f4-4274-4a14-9105-d5e57569244a" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/ML_Sports_Prediction.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/ML_Sports_Prediction.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/home.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/home.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/model.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/backtest.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/backtest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/train_nba.py" beforeDir="false" afterPath="$PROJECT_DIR$/src/train_nba.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,6 +40,65 @@
     &quot;accountId&quot;: &quot;19f3bcc0-3693-4811-a947-53ad2a38b0ca&quot;
   }
 }</component>
+  <component name="NextEditCompletionFeaturesState">
+    <decayedCancelled>
+      <entry key="MS100" value="1.6643429072019407" />
+      <entry key="MS500" value="1.9576073217079282" />
+      <entry key="S2" value="4.223727094769864" />
+      <entry key="S5" value="9.488230741180903" />
+      <entry key="S10" value="14.755520169512195" />
+      <entry key="S30" value="21.213230504195295" />
+      <entry key="S60" value="23.79208407617067" />
+      <entry key="M2" value="28.76546636982538" />
+      <entry key="M5" value="44.0377017915651" />
+      <entry key="M10" value="56.74449834942394" />
+      <entry key="M15" value="62.647481287318854" />
+      <entry key="M30" value="69.66070251859121" />
+      <entry key="H1" value="73.64952600307119" />
+      <entry key="H2" value="75.77752125893507" />
+      <entry key="H4" value="76.87668558578815" />
+      <entry key="D1" value="77.81108089223272" />
+      <entry key="W1" value="77.97296961981542" />
+    </decayedCancelled>
+    <decayedSelected>
+      <entry key="MS100" value="1.775471709073591E-25" />
+      <entry key="MS500" value="1.1216639224159552E-5" />
+      <entry key="S2" value="0.057871626407957726" />
+      <entry key="S5" value="0.31987940176279855" />
+      <entry key="S10" value="0.5655788201151083" />
+      <entry key="S30" value="0.8269851527318363" />
+      <entry key="S60" value="0.9093872402512783" />
+      <entry key="M2" value="0.9536179739556495" />
+      <entry key="M5" value="0.9811824493042808" />
+      <entry key="M10" value="0.9905465407058277" />
+      <entry key="M15" value="0.9936877220862274" />
+      <entry key="M30" value="0.9968388646547784" />
+      <entry key="H1" value="0.9984181812521136" />
+      <entry key="H2" value="0.999208777609621" />
+      <entry key="H4" value="0.9996043105197275" />
+      <entry key="D1" value="0.9999340408777299" />
+      <entry key="W1" value="0.9999905770018733" />
+    </decayedSelected>
+    <decayedShown>
+      <entry key="MS100" value="1.6032166427296008" />
+      <entry key="MS500" value="1.9426569603674981" />
+      <entry key="S2" value="4.227148523523133" />
+      <entry key="S5" value="9.666653061304242" />
+      <entry key="S10" value="15.183217883035924" />
+      <entry key="S30" value="21.967906245144402" />
+      <entry key="S60" value="24.660839654314206" />
+      <entry key="M2" value="29.696901055311347" />
+      <entry key="M5" value="45.008566365235254" />
+      <entry key="M10" value="57.72932760658912" />
+      <entry key="M15" value="63.63718652411238" />
+      <entry key="M30" value="70.65544899017415" />
+      <entry key="H1" value="74.64686929189195" />
+      <entry key="H2" value="76.77618494379942" />
+      <entry key="H4" value="77.8760153760727" />
+      <entry key="D1" value="78.81096890015488" />
+      <entry key="W1" value="78.97295361376183" />
+    </decayedShown>
+  </component>
   <component name="ProjectColorInfo">{
   &quot;associatedIndex&quot;: 0,
   &quot;fromUser&quot;: false
@@ -49,30 +111,35 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_MARK_IGNORED_FILES_AS_EXCLUDED&quot;: &quot;true&quot;,
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_MARK_IGNORED_FILES_AS_EXCLUDED": "true",
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "devcontainer.show.open.project.notification": "false",
+    "git-widget-placeholder": "main",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "E:/Projects/Projects/Python/ML_Sports_Prediction",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-js-predefined-d6986cc7102b-4abd2a77f808-JavaScript-PY-262.8665.369" />
         <option value="bundled-python-sdk-6fa658e1df1a-5bd6d13a2a75-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-262.8665.369" />
       </set>
     </attachedChunks>
@@ -88,7 +155,12 @@
       <workItem from="1785231058763" duration="7739000" />
       <workItem from="1785239035681" duration="921000" />
       <workItem from="1785240216885" duration="120000" />
-      <workItem from="1785257452963" duration="3211000" />
+      <workItem from="1785257452963" duration="3568000" />
+      <workItem from="1785332775059" duration="2000" />
+      <workItem from="1785335780869" duration="143000" />
+      <workItem from="1785337579866" duration="15000" />
+      <workItem from="1785432158399" duration="748000" />
+      <workItem from="1785433008334" duration="1176000" />
     </task>
     <servers />
   </component>

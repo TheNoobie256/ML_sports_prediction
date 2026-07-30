@@ -7,16 +7,9 @@ from sklearn.metrics import accuracy_score
 
 
 def add_rolling_form(df: pd.DataFrame) -> pd.DataFrame:
-    """
-    Calculates a 5-game rolling average of Shots on Target (HST/AST)
-    to approximate 'Expected Goals' (xG) and Offensive Form.
-    """
-    # 1. Sort chronologically to prevent Data Leakage
     df['Date'] = pd.to_datetime(df['Date'], dayfirst=True, errors='coerce')
     df = df.sort_values(by='Date').reset_index(drop=True)
 
-    # 2. Calculate rolling averages using shift(1) so it only looks at the PAST
-    # min_periods=1 ensures we get data even if it's only week 2 of the season
     df['home_offensive_form'] = df.groupby('HomeTeam')['HST'].transform(
         lambda x: x.shift(1).rolling(window=5, min_periods=1).mean()
     )
@@ -24,7 +17,6 @@ def add_rolling_form(df: pd.DataFrame) -> pd.DataFrame:
         lambda x: x.shift(1).rolling(window=5, min_periods=1).mean()
     )
 
-    # 3. Fill missing early-season values with a standard league average (4 shots on target)
     df['home_offensive_form'] = df['home_offensive_form'].fillna(4.0)
     df['away_offensive_form'] = df['away_offensive_form'].fillna(4.0)
 
@@ -35,24 +27,35 @@ def engineer_soccer_features(df: pd.DataFrame) -> tuple:
     print("   Calculating Offensive Form (xG equivalent)...")
     df = add_rolling_form(df)
 
-    # Drop rows missing the bookmaker odds or the result
+    import json
+    latest_form = {}
+
+    for team in df['HomeTeam'].dropna().unique():
+        team_matches = df[(df['HomeTeam'] == team) | (df['AwayTeam'] == team)]
+        if not team_matches.empty:
+            last_match = team_matches.iloc[-1]
+            if last_match['HomeTeam'] == team:
+                latest_form[team] = float(last_match['home_offensive_form'])
+            else:
+                latest_form[team] = float(last_match['away_offensive_form'])
+
+    Path("models").mkdir(parents=True, exist_ok=True)
+    with open("models/team_xg.json", "w") as f:
+        json.dump(latest_form, f)
+
     df = df.dropna(subset=['FTR', 'B365H', 'B365A', 'B365D']).copy()
 
-    # Target variable (1 for Home Win, 0 for Draw/Away)
     df['HomeWin'] = (df['FTR'] == 'H').astype(int)
 
-    # Implied Probabilities
     df['prob_home_implied'] = 1 / df['B365H']
     df['prob_away_implied'] = 1 / df['B365A']
     df['prob_draw_implied'] = 1 / df['B365D']
     df['home_favored'] = (df['prob_home_implied'] > df['prob_away_implied']).astype(int)
 
-    # Injury placeholders (Dynamically replaced during live UI calls)
     df['home_injury_impact'] = 0.0
     df['away_injury_impact'] = 0.0
     df['injury_differential'] = 0.0
 
-    # Our new 9-feature array
     features = [
         'prob_home_implied', 'prob_away_implied', 'prob_draw_implied', 'home_favored',
         'home_injury_impact', 'away_injury_impact', 'injury_differential',

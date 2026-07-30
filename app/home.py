@@ -55,7 +55,9 @@ with tab1:
                 if not odds_df.empty:
                     predictor = SportsPredictor()
                     predictor.load_model(sport_type=sport_type)
+
                     live_predictions = []
+                    team_xg_list = []
 
                     if sport_type == "soccer":
                         league_id_map = {
@@ -65,6 +67,14 @@ with tab1:
                         }
                         api_league_id = league_id_map.get(league_choice, 39)
                         league_injuries = fetch_league_injuries(api_football_key, api_league_id, season=2026)
+
+                        import json
+
+                        try:
+                            with open("models/team_xg.json", "r") as f:
+                                team_xg_dict = json.load(f)
+                        except FileNotFoundError:
+                            team_xg_dict = {}
 
                         for index, row in odds_df.iterrows():
                             try:
@@ -80,6 +90,9 @@ with tab1:
                             away_impact = away_injuries * BASE_INJURY_WEIGHT
                             differential = away_impact - home_impact
 
+                            current_home_xg = team_xg_dict.get(home_team, 4.0)
+                            current_away_xg = team_xg_dict.get(away_team, 4.0)
+
                             live_feature_row = pd.DataFrame([{
                                 'prob_home_implied': 1 / row['Odds'],
                                 'prob_away_implied': 1 / row.get('Away_Odds', row['Odds']),
@@ -88,18 +101,21 @@ with tab1:
                                 'home_injury_impact': home_impact,
                                 'away_injury_impact': away_impact,
                                 'injury_differential': differential,
-                                'home_offensive_form': 4.0,
-                                'away_offensive_form': 4.0
+                                'home_offensive_form': current_home_xg,
+                                'away_offensive_form': current_away_xg
                             }])
 
                             prediction = predictor.predict_match(live_feature_row)
 
                             if row['Team'] == home_team:
                                 live_predictions.append(prediction['home_win_prob'])
+                                team_xg_list.append(current_home_xg)
                             elif row['Team'] == away_team:
                                 live_predictions.append(prediction['away_win_prob'])
+                                team_xg_list.append(current_away_xg)
                             else:
                                 live_predictions.append(0.0)
+                                team_xg_list.append(0.0)
 
                     elif sport_type == "basketball":
                         for index, row in odds_df.iterrows():
@@ -126,6 +142,10 @@ with tab1:
                                 live_predictions.append(0.0)
 
                     odds_df['Model_Prob'] = live_predictions
+
+                    if sport_type == "soccer":
+                        odds_df['Team_xG'] = team_xg_list
+
                     odds_df['Bookie_Implied_Prob'] = 1 / odds_df['Odds']
                     odds_df['EV_ROI'] = (odds_df['Model_Prob'] * (odds_df['Odds'] - 1)) - (1 - odds_df['Model_Prob'])
 
@@ -136,6 +156,9 @@ with tab1:
                     value_bets['Model_Prob'] = (value_bets['Model_Prob'] * 100).map("{:.1f}%".format)
                     value_bets['Bookie_Implied_Prob'] = (value_bets['Bookie_Implied_Prob'] * 100).map("{:.1f}%".format)
                     value_bets['EV_ROI'] = (value_bets['EV_ROI'] * 100).map("{:.1f}%".format)
+
+                    if sport_type == "soccer" and not value_bets.empty:
+                        value_bets['Team_xG'] = value_bets['Team_xG'].map("{:.1f}".format)
 
                     value_bets['Suggested_Bet'] = (value_bets['Kelly_Fraction'].clip(lower=0) * 100).map(
                         "{:.2f}% of Bankroll".format)
